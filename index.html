@@ -120,7 +120,7 @@ function create() {
 
     //  An explosion pool
     explosions = game.add.group();
-    explosions.createMultiple(90, 'kaboom');
+    explosions.createMultiple(30, 'kaboom');
     explosions.forEach(setupInvader, this);
 
     //  And some controls to play the game with
@@ -132,12 +132,12 @@ function create() {
 }
 function doTheLoops(){
     
-        theGameTimer.repeat(1000,100,createnecks(),game)
-    
-    
-        theGameTimer.repeat(1000,100,descend(),game)
+      //  game.time.events.repeat(1000,100,createnecks(),this)
+    createnecks();
+   
+       // game.time.events.repeat(1000,100,descend(),this)
 
-     theGameTimer.start();
+    setTimeout(function(){ doTheLoops(); }, 800);
 }
 function chooseRandomNeckImage(){
     var theChoice;
@@ -191,26 +191,30 @@ function createnecks () {
 
             switch(neckDirection()){
                     case 'up':
-                    var neck = necks.create(getExOffset(), 0, chooseRandomNeckImage());
+                    var neck = necks.create(game.world.randomX, game.world.height, chooseRandomNeckImage());
                     neck.neckDirection="up";
+                    neck.body.velocity.y=  game.rnd.between(-100, -500);
                     break;
                     case 'left':
-                    var neck = necks.create(0,getWhyOffset(), chooseRandomNeckImage());
+                    var neck = necks.create(0,game.world.randomY, chooseRandomNeckImage());
                     neck.neckDirection="left";
+                     neck.body.velocity.x=  game.rnd.between(100, 500);
                     break;
                     case 'down':
-                    var neck = necks.create(getExOffset(),1 - windowHeight, chooseRandomNeckImage());
+                    var neck = necks.create(game.world.randomX,0, chooseRandomNeckImage());
                     neck.neckDirection="down";
+                    neck.body.velocity.y=  game.rnd.between(100, 500);
                     break;
                     case 'right':
-                    var neck = necks.create(1- windowWidth, getWhyOffset(), chooseRandomNeckImage());
+                    var neck = necks.create(game.world.width, game.world.randomY, chooseRandomNeckImage());
                     neck.neckDirection="right";
+                    neck.body.velocity.x=  game.rnd.between(-100, -500);
                     break;
             }
             neck.anchor.setTo(0.5, 0.5);           
             neck.body.moves = true;
         
-           
+          
 
     /*//  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
     
@@ -232,19 +236,19 @@ function setupInvader (invader) {
 }
 
 function descend() {
-    for (i=0;i<necks.children.length;i++){
+    /*for (i=0;i<necks.children.length;i++){
         console.log(necks.children[i].neckDirection);
         if(necks.children[i].neckDirection = "up"){
-             game.add.tween(necks.children[i]).to(  getWhyOffset() , 3000, Phaser.Easing.Linear.None, true, 0, 1000, true); 
+             game.add.tween(necks.children[i]).to(  {y:"+"+getWhyOffset(),x:getExOffset()/4} , 1000, Phaser.Easing.Linear.None, true, 0, 100, true); 
         }else if(necks.children[i].neckDirection = "down"){
-            game.add.tween(necks.children[i]).to( 1- getWhyOffset() , 3000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+            game.add.tween(necks.children[i]).to( {y:"-"+getWhyOffset(),x:getExOffset()/4}  , 1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
            
         }else if(necks.children[i].neckDirection = "left"){
-           game.add.tween(necks.children[i]).to(  getExOffset() , 3000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+           game.add.tween(necks.children[i]).to( {y:getExOffset()}  , 1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
         }else if(necks.children[i].neckDirection = "right"){
-           game.add.tween(necks.children[i]).to( 1- getExOffset() , 3000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+           game.add.tween(necks.children[i]).to( {y:1- getExOffset()}  , 1000, Phaser.Easing.Linear.None, true, 0, 1000, true);
         }
-    }
+    }*/
    
     
 }
@@ -319,7 +323,7 @@ function collisionHandler (bullet, neck) {
     explosion.play('kaboom', 30, false, true);
     explosion.kill();
 
-    doTheLoops();
+    
 
     if (score > 100000)
     {
@@ -349,9 +353,9 @@ function enemyHitsPlayer (player,bullet) {
 
     //  And create an explosion :)
     var explosion = explosions.getFirstExists(false);
-    explosion.reset(player.body.x, player.body.y);
+    explosion.reset(bullet.body.x, bullet.body.y);
     explosion.play('kaboom', 30, false, true);
-    explosion.kill();
+   setTimeout(function(){ explosion.kill(); }, 50);
     // When the player dies
     if (lives.countLiving() < 1)
     {
@@ -444,7 +448,7 @@ function fireBullet () {
                     
                 }
             }
-            bulletTime = game.time.now + 100;
+            bulletTime = game.time.now + 500;
         
     }
 
@@ -473,7 +477,7 @@ function restart () {
     stateText.visible = false;
 
 }
-
+ 
 
     };
 
